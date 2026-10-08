@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_SHA = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                }
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                sh 'docker build -f docker/Dockerfile -t nexvion-web:${GIT_SHA} .'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker rm -f nexvion-web || true'
+                sh 'docker run -d --name nexvion-web -p 8081:8080 nexvion-web:${GIT_SHA}'
+            }
+        }
+
+        }
+    }
