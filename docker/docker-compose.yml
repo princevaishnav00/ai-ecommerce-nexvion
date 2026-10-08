@@ -4,5 +4,6 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: nexvion-web
+    restart: unless-stopped
     ports:
       - "8081:8080"
